@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+cmd=$1; shift
+"$cmd" "$@" &
+pid=$!
+
+quit() {
+  kill -s "$1" "$pid"
+  wait "$pid" || true
+}
+
+trap 'quit SIGINT' SIGINT
+trap 'quit SIGTERM' SIGTERM
+trap 'quit SIGHUP' SIGHUP
+
+wait "$pid" || true
+wait "$pid" || true
+
+exit $?
